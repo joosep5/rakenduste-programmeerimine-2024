@@ -20,7 +20,7 @@ function App() {
       />
       <PropDrilling />
       <Counter />
-      <Name title="Raimo" />
+      <Name title="Joosep" />
       <Name />
     </>
   )
