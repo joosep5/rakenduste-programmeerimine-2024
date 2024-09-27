@@ -1,12 +1,12 @@
-import React, { useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import Cats from "./components/Cats";
 
 function App() {
-  useEffect(()=>{
-
-  })
-
+  return (
+    <>
+      <Cats />
+    </>
+  );
 }
 
 export default App;
