@@ -11,7 +11,11 @@ router.use(catsRouteMiddleware);
 // /cats/ Get endpoint level middleware
 router.get("/", catsGetRouteMiddleware, catsController.read);
 router.post("/", catsController.create);
-router.put("/", catsController.update);
-router.delete("/", catsController.delete);
+
+// Uuenda kassi nime (vajab kassi ID-d)
+router.put("/:id", catsController.update);
+
+// Kustuta kass (vajab kassi ID-d)
+router.delete("/:id", catsController.delete);
 
 module.exports = router;

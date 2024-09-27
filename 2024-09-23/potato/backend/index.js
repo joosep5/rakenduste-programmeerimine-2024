@@ -8,11 +8,13 @@ app.use(cors());
 app.use(morgan("dev"));
 
 const catsRoutes = require("./routes/cats.routes");
+const todosRoutes = require("./routes/todos.routes"); // Lisa todos.route.js
 const exampleRoutes = require("./routes/example.routes");
 
 app.use(express.json());
 
 app.use("/cats", catsRoutes);
+app.use("/todos", todosRoutes); // Lisa TODOde route-id
 app.use("/examples", exampleRoutes);
 
 app.get("/", (req, res) => {
