@@ -1,6 +1,7 @@
 import { Box, List, ListItem, Typography, Button, TextField, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import SubmitCat from "./SubmitCat";
+import { useTheme } from '@mui/material/styles';
 
 type Cat = {
   id: string;
@@ -14,6 +15,8 @@ const Cats = () => {
   const [cats, setCats] = useState<Cat[]>([]);
   const [editCatId, setEditCatId] = useState<string | null>(null);
   const [editCatName, setEditCatName] = useState<string>("");
+
+  const theme = useTheme(); // Kasutame Material UI teemat
 
   const fetchCats = async () => {
     const response = await fetch("http://localhost:8080/cats");
@@ -50,7 +53,9 @@ const Cats = () => {
 
   return (
     <Box>
-      <Typography variant="h3">Cats</Typography>
+      <Typography variant="h3" color={theme.palette.primary.main}>
+        Cats
+      </Typography>
       <List>
         {cats.map((cat) => (
           <ListItem key={cat.id}>
@@ -59,15 +64,36 @@ const Cats = () => {
                 <TextField
                   value={editCatName}
                   onChange={(e) => setEditCatName(e.target.value)}
+                  sx={{ color: theme.palette.primary.main }}
                 />
-                <Button onClick={() => handleUpdate(cat.id)}>Save</Button>
-                <Button onClick={() => setEditCatId(null)}>Cancel</Button>
+                <Button 
+                  onClick={() => handleUpdate(cat.id)} 
+                  sx={{ backgroundColor: theme.palette.primary.main, color: theme.palette.secondary.main }}
+                >
+                  Save
+                </Button>
+                <Button 
+                  onClick={() => setEditCatId(null)}
+                  sx={{ color: theme.palette.secondary.main }}
+                >
+                  Cancel
+                </Button>
               </Stack>
             ) : (
               <Box>
                 {JSON.stringify(cat)}
-                <Button onClick={() => setEditCatId(cat.id)}>Edit</Button>
-                <Button onClick={() => handleDelete(cat.id)}>Delete</Button>
+                <Button 
+                  onClick={() => setEditCatId(cat.id)}
+                  sx={{ color: theme.palette.primary.main }}
+                >
+                  Edit
+                </Button>
+                <Button 
+                  onClick={() => handleDelete(cat.id)}
+                  sx={{ color: theme.palette.secondary.main }}
+                >
+                  Delete
+                </Button>
               </Box>
             )}
           </ListItem>
