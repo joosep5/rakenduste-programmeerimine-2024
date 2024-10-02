@@ -1,5 +1,11 @@
+//backend/controllers/todo.controllers.js
 const crypto = require("crypto");
+const jwt = require("jsonwebtoken");
 
+// Secret for signing tokens (could be stored in env variables in production)
+const JWT_SECRET = "mysecretkey";
+
+// Näidis TODO-de andmed
 const todos = [
   {
     id: crypto.randomUUID(),
@@ -18,6 +24,38 @@ const todos = [
     deleted: false,
   },
 ];
+
+// JWT: Genereeri token
+exports.generateToken = (req, res) => {
+  const { name } = req.body;
+
+  if (!name || name === "") {
+    return res.status(400).send({ message: "Name is required to generate token" });
+  }
+
+  // Create a token with the name
+  const token = jwt.sign({ name }, JWT_SECRET, { expiresIn: "1h" });
+  res.send({ token });
+};
+
+// JWT: Verifitseeri token
+exports.verifyToken = (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).send({ message: "Token is required" });
+  }
+
+  // Verify the token
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Invalid token" });
+    }
+
+    // If the token is valid, return the decoded info
+    res.send({ message: "Token is valid", decoded });
+  });
+};
 
 // Loo uus TODO
 exports.create = (req, res) => {
