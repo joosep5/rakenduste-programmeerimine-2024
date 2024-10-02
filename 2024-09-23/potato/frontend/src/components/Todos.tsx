@@ -18,14 +18,12 @@ const Todos = () => {
   const [editTodoTitle, setEditTodoTitle] = useState<string>("");
   const [editTodoPriority, setEditTodoPriority] = useState<number>(1);
 
-  // Fetch TODOs from the backend
   const fetchTodos = async () => {
     const response = await fetch("http://localhost:8080/todos");
     const data = await response.json();
     setTodos(data);
   };
 
-  // Add a new TODO
   const submitTodo = async () => {
     if (newTitle.trim() === "") return;
     await fetch("http://localhost:8080/todos", {
@@ -41,7 +39,6 @@ const Todos = () => {
     fetchTodos();
   };
 
-  // Update an existing TODO
   const handleUpdate = async (id: string) => {
     if (editTodoTitle.trim() === "") return;
     await fetch(`http://localhost:8080/todos/${id}`, {
@@ -58,7 +55,6 @@ const Todos = () => {
     fetchTodos();
   };
 
-  // Delete a TODO
   const handleDelete = async (id: string) => {
     await fetch(`http://localhost:8080/todos/${id}`, {
       method: "DELETE",
@@ -72,7 +68,7 @@ const Todos = () => {
 
   return (
     <Box>
-      <Typography variant="h3">TODOs</Typography>
+      <Typography variant="h3" sx={{ color: 'red' }}>TODOs</Typography>
       <List>
         {todos.map((todo) => (
           <ListItem key={todo.id}>
@@ -89,14 +85,14 @@ const Todos = () => {
                   value={editTodoPriority}
                   onChange={(e) => setEditTodoPriority(Number(e.target.value))}
                 />
-                <Button onClick={() => handleUpdate(todo.id)}>Save</Button>
+                <Button sx={{ color: 'green' }} onClick={() => handleUpdate(todo.id)}>Save</Button>
                 <Button onClick={() => setEditTodoId(null)}>Cancel</Button>
               </Stack>
             ) : (
               <Box>
                 {`Title: ${todo.title}, Priority: ${todo.priority}, Created At: ${new Date(todo.createdAt).toLocaleString()}`}
-                <Button onClick={() => { setEditTodoId(todo.id); setEditTodoTitle(todo.title); setEditTodoPriority(todo.priority); }}>Edit</Button>
-                <Button onClick={() => handleDelete(todo.id)}>Delete</Button>
+                <Button sx={{ color: 'green' }} onClick={() => { setEditTodoId(todo.id); setEditTodoTitle(todo.title); setEditTodoPriority(todo.priority); }}>Edit</Button>
+                <Button sx={{ color: 'pink' }} onClick={() => handleDelete(todo.id)}>Delete</Button>
               </Box>
             )}
           </ListItem>
@@ -116,7 +112,7 @@ const Todos = () => {
           value={newPriority}
           onChange={(e) => setNewPriority(Number(e.target.value))}
         />
-        <Button onClick={submitTodo}>Add</Button>
+        <Button sx={{ color: 'green' }} onClick={submitTodo}>Add</Button>
       </Stack>
     </Box>
   );
