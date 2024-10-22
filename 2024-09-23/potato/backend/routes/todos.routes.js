@@ -1,26 +1,47 @@
 //backend/routes/todos.routes.js
 const express = require("express");
+const { body } = require('express-validator');
 const router = express.Router();
 const todosController = require("../controllers/todos.controller");
 
 // Näita kõiki mitte-kustutatud TODO-sid
 router.get("/", todosController.read);
 
-// Loo uus TODO
-router.post("/", todosController.create);
+// Loo uus TODO valideerimisega
+router.post(
+  "/",
+  [
+    body("title").notEmpty().withMessage("Title is required"),
+    body("priority").optional().isInt({ min: 1, max: 5 }).withMessage("Priority must be between 1 and 5"),
+  ],
+  todosController.create
+);
 
-// Uuenda TODO (vajab ID-d)
-router.put("/:id", todosController.update);
+// Uuenda TODO valideerimisega
+router.put(
+  "/:id",
+  [
+    body("title").optional().notEmpty().withMessage("Title cannot be empty"),
+    body("priority").optional().isInt({ min: 1, max: 5 }).withMessage("Priority must be between 1 and 5"),
+  ],
+  todosController.update
+);
 
-// Kustuta TODO (vajab ID-d)
+// Kustuta TODO
 router.delete("/:id", todosController.delete);
 
-// JWT: Genereeri token nime põhjal (POST meetod)
-//localhost:8080/todos/token
-router.post("/token", todosController.generateToken);
+// JWT: Genereeri token valideerimisega (POST meetod)
+router.post(
+  "/token",
+  [body("name").notEmpty().withMessage("Name is required")],
+  todosController.generateToken
+);
 
-// JWT: Verifitseeri saadud token (POST meetod)
-//localhost:8080/todos/verify-token
-router.post("/verify-token", todosController.verifyToken);
+// JWT: Verifitseeri token valideerimisega (POST meetod)
+router.post(
+  "/verify-token",
+  [body("token").notEmpty().withMessage("Token is required")],
+  todosController.verifyToken
+);
 
 module.exports = router;

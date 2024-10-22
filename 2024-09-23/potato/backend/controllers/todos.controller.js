@@ -1,8 +1,9 @@
 //backend/controllers/todo.controllers.js
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
+const { body, validationResult } = require('express-validator');
 
-// Secret for signing tokens (could be stored in env variables in production)
+// Secret for signing tokens
 const JWT_SECRET = "mysecretkey";
 
 // Näidis TODO-de andmed
@@ -22,24 +23,29 @@ const todos = [
     createdAt: Date.now(),
     updatedAt: null,
     deleted: false,
-  },
+  },  
 ];
 
 // JWT: Genereeri token
 exports.generateToken = (req, res) => {
-  const { name } = req.body;
-
-  if (!name || name === "") {
-    return res.status(400).send({ message: "Name is required to generate token" });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
   // Create a token with the name
+  const { name } = req.body;
   const token = jwt.sign({ name }, JWT_SECRET, { expiresIn: "1h" });
   res.send({ token });
 };
 
 // JWT: Verifitseeri token
 exports.verifyToken = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { token } = req.body;
 
   if (!token) {
@@ -57,20 +63,18 @@ exports.verifyToken = (req, res) => {
   });
 };
 
-// Loo uus TODO
+// Loo uus TODO valideerimisega
 exports.create = (req, res) => {
-  const { title, priority } = req.body;
-
-  if (!title || title === "") {
-    return res
-      .status(418)
-      .send({ type: "Error", message: "Must include a title" });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
+  const { title, priority } = req.body;
   const newTodo = {
     id: crypto.randomUUID(),
-    title: title,
-    priority: priority || 1, // default priority = 1
+    title,
+    priority: priority || 1,
     createdAt: Date.now(),
     updatedAt: null,
     deleted: false,
@@ -86,8 +90,13 @@ exports.read = (req, res) => {
   res.send(activeTodos);
 };
 
-// Uuenda TODO-d
+// Uuenda TODO valideerimisega
 exports.update = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { id } = req.params;
   const { title, priority } = req.body;
 
@@ -96,18 +105,17 @@ exports.update = (req, res) => {
   const todo = todos.find(todo => todo.id === id);
 
   if (!todo) {
-    return res.status(404).send({ type: "Error", message: "TODO not found" });
+    return res.status(404).send({ message: "TODO not found" });
   }
 
   if (todo.deleted) {
-    return res.status(410).send({ type: "Error", message: "TODO is deleted" });
+    return res.status(410).send({ message: "TODO is deleted" });
   }
 
   if (title) todo.title = title;
   if (priority) todo.priority = priority;
 
   todo.updatedAt = Date.now();
-
   res.send(todo);
 };
 
@@ -120,15 +128,14 @@ exports.delete = (req, res) => {
   const todo = todos.find(todo => todo.id === id);
 
   if (!todo) {
-    return res.status(404).send({ type: "Error", message: "TODO not found" });
+    return res.status(404).send({ message: "TODO not found" });
   }
 
   if (todo.deleted) {
-    return res.status(410).send({ type: "Error", message: "TODO is already deleted" });
+    return res.status(410).send({ message: "TODO is already deleted" });
   }
 
   todo.deleted = true;
   todo.updatedAt = Date.now();
-
   res.send({ message: "TODO deleted", todo });
 };
